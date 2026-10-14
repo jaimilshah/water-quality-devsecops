@@ -15,7 +15,8 @@ pipeline {
 
   environment {
     IMAGE = "water-quality-monitor:${env.BUILD_NUMBER}"
-    TRIVY = 'docker run --rm -v trivy-cache:/root/.cache/ aquasec/trivy:latest'
+    TRIVY_RUN = 'docker run --rm -v trivy-cache:/root/.cache/'
+    TRIVY_IMG = 'aquasec/trivy:latest'
   }
 
   stages {
@@ -58,10 +59,10 @@ pipeline {
     stage('Trivy: dependencies, secrets, IaC') {
       steps {
         sh '''
-          ${TRIVY} -v "$PWD":/w -w /w fs \
+          ${TRIVY_RUN} -v "$PWD":/w -w /w ${TRIVY_IMG} fs \
             --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 \
             --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform --format table .
-          ${TRIVY} -v "$PWD":/w -w /w fs \
+          ${TRIVY_RUN} -v "$PWD":/w -w /w ${TRIVY_IMG} fs \
             --scanners vuln,secret,misconfig --format json -o reports/trivy-fs.json \
             --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform .
         '''
@@ -75,9 +76,9 @@ pipeline {
     stage('Trivy: image scan') {
       steps {
         sh '''
-          ${TRIVY} -v /var/run/docker.sock:/var/run/docker.sock image \
+          ${TRIVY_RUN} -v /var/run/docker.sock:/var/run/docker.sock ${TRIVY_IMG} image \
             --severity HIGH,CRITICAL --exit-code 1 ${IMAGE}
-          ${TRIVY} -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out image \
+          ${TRIVY_RUN} -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out ${TRIVY_IMG} image \
             --format json -o /out/trivy-image.json ${IMAGE}
         '''
       }
