@@ -13,6 +13,8 @@ services:
       - "127.0.0.1:9000:9000"
     environment:
       SONAR_SEARCH_JAVAADDITIONALOPTS: "-Dnode.store.allow_mmap=false"
+      # Local lab only: allow the webhook to reach Jenkins on the private Docker network.
+      SONAR_VALIDATEWEBHOOKS: "false"
     volumes:
       - sonar_data:/opt/sonarqube/data
       - sonar_logs:/opt/sonarqube/logs

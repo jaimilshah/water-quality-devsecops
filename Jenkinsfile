@@ -15,7 +15,7 @@ pipeline {
 
   environment {
     IMAGE = "water-quality-monitor:${env.BUILD_NUMBER}"
-    TRIVY = 'aquasec/trivy:latest'
+    TRIVY = 'docker run --rm -v trivy-cache:/root/.cache/ aquasec/trivy:latest'
   }
 
   stages {
@@ -41,7 +41,7 @@ pipeline {
       steps {
         withSonarQubeEnv('sonarqube') {
           sh '''
-            docker run --rm --network wq-ci-net -e SONAR_HOST_URL -e SONAR_TOKEN \
+            docker run --rm --network wq-ci-net -e SONAR_HOST_URL -e SONAR_TOKEN="${SONAR_AUTH_TOKEN:-$SONAR_TOKEN}" \
               -v "$PWD":/usr/src sonarsource/sonar-scanner-cli:latest
           '''
         }
@@ -57,12 +57,12 @@ pipeline {
     stage('Trivy: dependencies, secrets, IaC') {
       steps {
         sh '''
-          docker run --rm -v "$PWD":/w -w /w ${TRIVY} fs \
+          ${TRIVY} -v "$PWD":/w -w /w fs \
             --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 \
-            --skip-dirs .git,reports,.venv --format table .
-          docker run --rm -v "$PWD":/w -w /w ${TRIVY} fs \
+            --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform --format table .
+          ${TRIVY} -v "$PWD":/w -w /w fs \
             --scanners vuln,secret,misconfig --format json -o reports/trivy-fs.json \
-            --skip-dirs .git,reports,.venv .
+            --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform .
         '''
       }
     }
@@ -74,9 +74,9 @@ pipeline {
     stage('Trivy: image scan') {
       steps {
         sh '''
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ${TRIVY} image \
+          ${TRIVY} -v /var/run/docker.sock:/var/run/docker.sock image \
             --severity HIGH,CRITICAL --exit-code 1 ${IMAGE}
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out ${TRIVY} image \
+          ${TRIVY} -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out image \
             --format json -o /out/trivy-image.json ${IMAGE}
         '''
       }
@@ -97,10 +97,10 @@ pipeline {
       steps {
         sh '''
           docker rm -f wq-deployed >/dev/null 2>&1 || true
-          docker run -d --name wq-deployed -p 8081:8000 --restart unless-stopped \
+          docker run -d --name wq-deployed --network wq-ci-net -p 8081:8000 --restart unless-stopped \
             --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges ${IMAGE}
-          sleep 5
-          curl -fsS http://localhost:8081/health
+          for i in 1 2 3 4 5 6 7 8; do curl -fsS http://wq-deployed:8000/health && break; sleep 3; done
+          curl -fsS http://wq-deployed:8000/health
         '''
       }
     }
