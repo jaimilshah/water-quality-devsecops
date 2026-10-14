@@ -113,6 +113,14 @@ function drawChart(series, readings, thresholds) {
   });
 }
 
+// Alert format: "[STATUS] <date> <time> -- <message>" (parsed without regex backtracking).
+function parseAlert(line) {
+  const sep = line.indexOf(" -- ");
+  const close = line.indexOf("]");
+  if (!line.startsWith("[") || sep < 0 || close < 0 || close > sep) return null;
+  return { status: line.slice(1, close), time: line.slice(close + 2, sep), message: line.slice(sep + 4) };
+}
+
 function renderAlerts(alerts) {
   const list = $("alerts-list");
   list.replaceChildren();
@@ -122,12 +130,12 @@ function renderAlerts(alerts) {
     return;
   }
   alerts.forEach((line) => {
-    const match = /^\[(\w+)\]\s+(\S+\s\S+)\s+--\s+(.*)$/.exec(line);
     const row = el("div", "alert-row");
-    if (match) {
-      row.appendChild(el("span", `alert-badge ${match[1]}`, match[1]));
-      row.appendChild(el("span", "alert-time", match[2]));
-      row.appendChild(el("span", "", match[3]));
+    const parsed = parseAlert(line);
+    if (parsed) {
+      row.appendChild(el("span", `alert-badge ${parsed.status}`, parsed.status));
+      row.appendChild(el("span", "alert-time", parsed.time));
+      row.appendChild(el("span", "", parsed.message));
     } else {
       row.textContent = line;
     }
@@ -197,9 +205,10 @@ $("process-btn").addEventListener("click", () => {
   if (!pendingFile) return;
   const form = new FormData();
   form.append("file", pendingFile);
-  callApi(fetch("/api/process", { method: "POST", body: form }));
+  const token = document.querySelector('meta[name="csrf-token"]').content;
+  void callApi(fetch("/api/process", { method: "POST", body: form, headers: { "X-CSRFToken": token } }));
 });
 
 $("simulate-btn").addEventListener("click", () => {
-  callApi(fetch("/api/simulate?n=40"));
+  void callApi(fetch("/api/simulate?n=40"));
 });

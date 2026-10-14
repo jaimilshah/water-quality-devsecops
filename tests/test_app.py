@@ -11,7 +11,16 @@ CSV = ("timestamp,ph,turbidity_ntu,tds_ppm,dissolved_oxygen_mgL,temperature_c\n"
 @pytest.fixture()
 def client():
     app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
     return app.test_client()
+
+
+@pytest.fixture()
+def csrf_client():
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = True
+    yield app.test_client()
+    app.config["WTF_CSRF_ENABLED"] = False
 
 
 def test_health(client):
@@ -72,3 +81,22 @@ def test_upload_too_large(client):
     resp = client.post("/api/process", data={"file": (io.BytesIO(big), "d.csv")},
                        content_type="multipart/form-data")
     assert resp.status_code == 413
+
+
+def _upload(client, headers=None):
+    return client.post("/api/process", data={"file": (io.BytesIO(CSV.encode()), "d.csv")},
+                       content_type="multipart/form-data", headers=headers or {})
+
+
+def test_upload_without_csrf_token_is_rejected(csrf_client):
+    resp = _upload(csrf_client)
+    assert resp.status_code == 400
+    assert "CSRF" in resp.get_json()["error"]
+
+
+def test_upload_with_valid_csrf_token_succeeds(csrf_client):
+    page = csrf_client.get("/").get_data(as_text=True)
+    token = page.split('name="csrf-token" content="')[1].split('"')[0]
+    resp = _upload(csrf_client, {"X-CSRFToken": token})
+    assert resp.status_code == 200
+    assert resp.get_json()["summary"]["total"] == 2

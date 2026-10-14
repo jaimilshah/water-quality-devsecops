@@ -62,7 +62,10 @@ def test_simulation_matches_reference_split():
 
 
 def test_simulation_is_reproducible():
-    assert simulate_session(10, seed=1) == simulate_session(10, seed=1)
+    first = simulate_session(10, seed=1)
+    second = simulate_session(10, seed=1)
+    assert first == second
+    assert simulate_session(10, seed=2) != first
 
 
 def test_parse_csv_ok():

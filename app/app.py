@@ -1,7 +1,9 @@
 """Water Quality Monitoring & Alert System - Flask web application."""
 import os
+import secrets
 
 from flask import Flask, jsonify, render_template, request
+from flask_wtf.csrf import CSRFError, CSRFProtect
 
 from core import DatasetError, parse_csv, process_readings, simulate_session
 
@@ -9,6 +11,9 @@ MAX_UPLOAD_BYTES = 1 * 1024 * 1024  # 1 MB
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES
+# Gunicorn runs with --preload, so every worker shares this key.
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
+csrf = CSRFProtect(app)
 
 
 @app.after_request
@@ -66,6 +71,11 @@ def api_process():
     except DatasetError as exc:
         return jsonify(error=str(exc)), 400
     return jsonify(process_readings(readings))
+
+
+@app.errorhandler(CSRFError)
+def csrf_failed(_):
+    return jsonify(error="Missing or invalid CSRF token"), 400
 
 
 @app.errorhandler(413)
