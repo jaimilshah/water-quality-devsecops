@@ -8,7 +8,7 @@ A Flask web application that validates, classifies and raises alerts on water-qu
 | Concern | Tool | Where |
 |---|---|---|
 | Website | Python / Flask / Gunicorn, Chart.js | `app/` |
-| Tests | pytest + coverage (98%) | `tests/` |
+| Tests | pytest + coverage (99%, 31 tests incl. CSRF) | `tests/` |
 | Version control | Git + GitHub | this repo |
 | Containerisation | Docker (Alpine, non-root, no pip in runtime) | `Dockerfile` |
 | CI/CD | Jenkins declarative pipeline | `Jenkinsfile`, `ci/` |
@@ -21,16 +21,16 @@ A Flask web application that validates, classifies and raises alerts on water-qu
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
-.venv/bin/python -m pytest                      # 29 tests
+.venv/bin/python -m pytest                      # 31 tests
 cd app && ../.venv/bin/python app.py            # http://127.0.0.1:5000
 ```
 
 ## Run with Docker
 
 ```bash
-docker build -t water-quality-monitor:1.2.0 .
+docker build -t water-quality-monitor:1.3.0 .
 docker run -d -p 8080:8000 --read-only --tmpfs /tmp --cap-drop ALL \
-  --security-opt no-new-privileges water-quality-monitor:1.2.0
+  --security-opt no-new-privileges water-quality-monitor:1.3.0
 curl localhost:8080/health
 ```
 
