@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+*.pyc
+tests
+reports
+diagrams
+docs
+terraform
+.pytest_cache
+.coverage
+*.md
+Jenkinsfile

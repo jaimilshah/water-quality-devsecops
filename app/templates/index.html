@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Water Quality Monitoring Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+<script src="{{ url_for('static', filename='chart.umd.min.js') }}" defer></script>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <h1>Water Quality Monitoring &amp; Alert System</h1>
+        <p>SEP DevSecOps micro project &middot; SDG 6 &amp; SDG 9 &middot; secure, containerised, CI/CD-delivered</p>
+      </div>
+      <span class="live-badge"><span class="live-dot" id="live-dot"></span> <span id="session-label">Waiting for data&hellip;</span></span>
+    </header>
+
+    <section class="panel" id="intake-panel">
+      <h2>1. Feed the system a dataset</h2>
+      <p class="intake-desc">Upload a sensor-reading CSV (timestamp, ph, turbidity_ntu, tds_ppm, dissolved_oxygen_mgL, temperature_c). The server validates, classifies and raises alerts for every row &mdash; nothing is pre-computed.</p>
+      <div class="intake-controls">
+        <label class="file-btn">
+          Choose CSV file
+          <input type="file" id="file-input" accept=".csv" />
+        </label>
+        <span id="file-name" class="file-name">No file selected</span>
+        <button id="process-btn" class="btn primary" disabled>Process Dataset</button>
+        <span class="or-sep">or, if you don't have a file handy</span>
+        <button id="simulate-btn" class="btn">Simulate a Dataset</button>
+        <a href="{{ url_for('static', filename='sample_data.csv') }}" download class="link-small">download a sample CSV</a>
+      </div>
+      <p id="error-msg" class="error-msg" hidden></p>
+    </section>
+
+    <section class="panel" id="console-panel" hidden>
+      <h2>2. Pipeline processing <span class="sub">VALIDATE &rarr; CLASSIFY &rarr; ALERT &rarr; LOG</span></h2>
+      <div class="console" id="console"></div>
+    </section>
+
+    <div id="results" hidden>
+      <section class="stats" id="stat-cards"></section>
+
+      <section class="panel">
+        <h2>Alert status per sample <span class="sub">green = SAFE &middot; amber = WARNING &middot; red = UNSAFE</span></h2>
+        <div class="status-strip" id="status-strip"></div>
+        <div class="strip-legend">
+          <span><span class="swatch SAFE"></span>Safe</span>
+          <span><span class="swatch WARNING"></span>Warning</span>
+          <span><span class="swatch UNSAFE"></span>Unsafe</span>
+          <span id="strip-hover" class="strip-hover">Hover a bar for details</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Sensor trends</h2>
+        <div class="chart-grid">
+          <div class="chart-box"><canvas id="chart-ph"></canvas></div>
+          <div class="chart-box"><canvas id="chart-turbidity"></canvas></div>
+          <div class="chart-box"><canvas id="chart-tds"></canvas></div>
+          <div class="chart-box"><canvas id="chart-do"></canvas></div>
+          <div class="chart-box"><canvas id="chart-temp"></canvas></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Alert log <span class="sub" id="alert-count-label"></span></h2>
+        <div class="alerts-list" id="alerts-list"></div>
+      </section>
+    </div>
+
+    <footer>
+      Flask backend &middot; served by Gunicorn in a non-root Docker container &middot; built &amp; scanned by Jenkins (SonarQube + Trivy) &middot; infrastructure by Terraform on AWS.
+    </footer>
+  </div>
+</body>
+</html>
