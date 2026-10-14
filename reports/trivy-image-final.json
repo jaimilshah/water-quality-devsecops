@@ -3,41 +3,39 @@
   "Trivy": {
     "Version": "0.74.0"
   },
-  "ReportID": "01a13b7b-db91-78be-b773-9c2782aa68d1",
-  "CreatedAt": "2026-10-14T23:05:35.313574+05:30",
-  "ArtifactID": "sha256:e1887e35c745e472717bffb9349f99ac0451ea3ac5c5811981b512a03c4e8535",
-  "ArtifactName": "water-quality-monitor:1.2.0",
+  "ReportID": "01a13bd8-2b63-701f-a127-34232e053cd8",
+  "CreatedAt": "2026-10-15T00:46:25.059009+05:30",
+  "ArtifactID": "sha256:efb97c9f569c519d23a0d5021450b0a47fec56ab4258b772cecfd9cb332bec94",
+  "ArtifactName": "water-quality-monitor:6",
   "ArtifactType": "container_image",
   "Metadata": {
-    "Size": 69917696,
+    "Size": 70791168,
     "OS": {
       "Family": "alpine",
       "Name": "3.24.2"
     },
-    "ImageID": "sha256:a45e8258fee4123eda686f1d7eb3d091c8541c688de920e4c8400e671c331f79",
+    "ImageID": "sha256:195d0001b21b05ae17ac0ab6e3637a97c842195e7fd293a053cbc36c150408e1",
     "DiffIDs": [
       "sha256:1b349a3334531b575b01d409540dd8aca14ef29abddacd50f36643d7c949db4b",
       "sha256:7c4312dd8e7ffa37c352b878b1a14c3659ed0c3f737df462b1bd37cbb5463055",
       "sha256:c92ff27b24b0713204817adb1002bb990498903c608bf0b307e3cb75ca30d09c",
       "sha256:1bde858851e91b11ae837cedfb5c8597755f1204e1d33b3b6d89547fbbdfeb3a",
-      "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-      "sha256:a306450ba317c1fbaeec6ad3d7c7f145ae508d6f90ecfdb41a5e8e7773e8bb5a",
-      "sha256:bd7489119417dec416f2ea788ec7033b137ef37ac95a536724ef1775a8914cab",
-      "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3",
-      "sha256:15e3f45c4c67288f2009c119dfd1a2aa6cd539093d8e6878ec9079cd28c3f2dc",
-      "sha256:5a20ee8210556d791b5c5b94260916260534d47b966b7b6c6c2b245b14feeae1",
-      "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+      "sha256:d262770cd072ab9e874a22f66dedd2f609f492f2d2896572fe5e5f949ed3914c",
+      "sha256:781abe2ff34ec2ffbd571519c73a7137a1c0b11a3adaf4a2395a1a5841fc053e",
+      "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60",
+      "sha256:f48e31dd25c5558345cf448d67fb1887e2af961a2deee3ec7bcd4081f8636b16",
+      "sha256:e2dd1adf01ea8e1e1421d911f0f466f68784bdf984a403a6edd603e333d39dfb"
     ],
     "RepoTags": [
-      "water-quality-monitor:1.2.0"
+      "water-quality-monitor:6"
     ],
     "RepoDigests": [
-      "water-quality-monitor@sha256:a45e8258fee4123eda686f1d7eb3d091c8541c688de920e4c8400e671c331f79"
+      "water-quality-monitor@sha256:195d0001b21b05ae17ac0ab6e3637a97c842195e7fd293a053cbc36c150408e1"
     ],
-    "Reference": "water-quality-monitor:1.2.0",
+    "Reference": "water-quality-monitor:6",
     "ImageConfig": {
       "architecture": "arm64",
-      "created": "2026-10-14T17:35:33.532655339Z",
+      "created": "2026-10-14T19:15:55.330110217Z",
       "history": [
         {
           "created": "2026-09-17T20:37:05Z",
@@ -102,68 +100,58 @@
           "empty_layer": true
         },
         {
-          "created": "2026-10-14T17:34:50Z",
-          "created_by": "ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8000",
-          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-10-14T19:04:02Z",
+          "created_by": "/bin/sh -c #(nop)  ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8000",
           "empty_layer": true
         },
         {
-          "created": "2026-10-14T17:34:50Z",
-          "created_by": "WORKDIR /srv",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:26Z",
-          "created_by": "RUN /bin/sh -c apk upgrade --no-cache # buildkit",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:26Z",
-          "created_by": "COPY requirements.txt . # buildkit",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "RUN /bin/sh -c pip install --no-cache-dir --upgrade pip  \u0026\u0026 pip install --no-cache-dir -r requirements.txt  \u0026\u0026 pip uninstall -y pip # buildkit",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "COPY app/ ./app/ # buildkit",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "RUN /bin/sh -c adduser -S -D -H -s /sbin/nologin appuser # buildkit",
-          "comment": "buildkit.dockerfile.v0"
-        },
-        {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "USER appuser",
-          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-10-14T19:04:02Z",
+          "created_by": "/bin/sh -c #(nop) WORKDIR /srv",
           "empty_layer": true
         },
         {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "WORKDIR /srv/app",
-          "comment": "buildkit.dockerfile.v0"
+          "created": "2026-10-14T19:04:03Z",
+          "created_by": "/bin/sh -c apk upgrade --no-cache"
         },
         {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "EXPOSE [8000/tcp]",
-          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-10-14T19:12:32Z",
+          "created_by": "/bin/sh -c #(nop) COPY file:46dd67288378fdf86242b5012e707271d24ea55c3cfa3a2e5ff54bfa1e75d55b in . "
+        },
+        {
+          "created": "2026-10-14T19:12:39Z",
+          "created_by": "/bin/sh -c pip install --no-cache-dir --upgrade pip  \u0026\u0026 pip install --no-cache-dir -r requirements.txt  \u0026\u0026 pip uninstall -y pip"
+        },
+        {
+          "created": "2026-10-14T19:15:53Z",
+          "created_by": "/bin/sh -c #(nop) COPY dir:f1ef059d67bee028c28a6051e03bfef587d05ca594d19d67dca18b230238a3c8 in ./app/ "
+        },
+        {
+          "created": "2026-10-14T19:15:54Z",
+          "created_by": "/bin/sh -c adduser -S -D -H -s /sbin/nologin appuser"
+        },
+        {
+          "created": "2026-10-14T19:15:54Z",
+          "created_by": "/bin/sh -c #(nop)  USER appuser",
           "empty_layer": true
         },
         {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "HEALTHCHECK {Test:[CMD-SHELL python -c \"import urllib.request,os;urllib.request.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT','8000'))\"] Interval:30s Timeout:3s StartPeriod:5s StartInterval:0s Retries:3}",
-          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-10-14T19:15:54Z",
+          "created_by": "/bin/sh -c #(nop) WORKDIR /srv/app",
           "empty_layer": true
         },
         {
-          "created": "2026-10-14T17:35:33Z",
-          "created_by": "CMD [\"sh\" \"-c\" \"exec gunicorn --bind 0.0.0.0:${PORT} --workers 2 --access-logfile - app:app\"]",
-          "comment": "buildkit.dockerfile.v0",
+          "created": "2026-10-14T19:15:54Z",
+          "created_by": "/bin/sh -c #(nop)  EXPOSE 8000",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-10-14T19:15:55Z",
+          "created_by": "/bin/sh -c #(nop)  HEALTHCHECK \u0026{Test:[CMD-SHELL python -c \"import urllib.request,os;urllib.request.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT','8000'))\"] Interval:30s Timeout:3s StartPeriod:5s StartInterval:0s Retries:3}",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-10-14T19:15:55Z",
+          "created_by": "/bin/sh -c #(nop)  CMD [\"sh\" \"-c\" \"exec gunicorn --preload --bind 0.0.0.0:${PORT} --workers 2 --access-logfile - app:app\"]",
           "empty_layer": true
         }
       ],
@@ -175,20 +163,18 @@
           "sha256:7c4312dd8e7ffa37c352b878b1a14c3659ed0c3f737df462b1bd37cbb5463055",
           "sha256:c92ff27b24b0713204817adb1002bb990498903c608bf0b307e3cb75ca30d09c",
           "sha256:1bde858851e91b11ae837cedfb5c8597755f1204e1d33b3b6d89547fbbdfeb3a",
-          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
-          "sha256:a306450ba317c1fbaeec6ad3d7c7f145ae508d6f90ecfdb41a5e8e7773e8bb5a",
-          "sha256:bd7489119417dec416f2ea788ec7033b137ef37ac95a536724ef1775a8914cab",
-          "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3",
-          "sha256:15e3f45c4c67288f2009c119dfd1a2aa6cd539093d8e6878ec9079cd28c3f2dc",
-          "sha256:5a20ee8210556d791b5c5b94260916260534d47b966b7b6c6c2b245b14feeae1",
-          "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+          "sha256:d262770cd072ab9e874a22f66dedd2f609f492f2d2896572fe5e5f949ed3914c",
+          "sha256:781abe2ff34ec2ffbd571519c73a7137a1c0b11a3adaf4a2395a1a5841fc053e",
+          "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60",
+          "sha256:f48e31dd25c5558345cf448d67fb1887e2af961a2deee3ec7bcd4081f8636b16",
+          "sha256:e2dd1adf01ea8e1e1421d911f0f466f68784bdf984a403a6edd603e333d39dfb"
         ]
       },
       "config": {
         "Cmd": [
           "sh",
           "-c",
-          "exec gunicorn --bind 0.0.0.0:${PORT} --workers 2 --access-logfile - app:app"
+          "exec gunicorn --preload --bind 0.0.0.0:${PORT} --workers 2 --access-logfile - app:app"
         ],
         "Healthcheck": {
           "Test": [
@@ -214,8 +200,7 @@
         "WorkingDir": "/srv/app",
         "ExposedPorts": {
           "8000/tcp": {}
-        },
-        "ArgsEscaped": true
+        }
       }
     },
     "Layers": [
@@ -240,45 +225,35 @@
         "DiffID": "sha256:1bde858851e91b11ae837cedfb5c8597755f1204e1d33b3b6d89547fbbdfeb3a"
       },
       {
-        "Size": 1024,
-        "Digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
-        "DiffID": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
-      },
-      {
         "Size": 1096704,
-        "Digest": "sha256:48865f2bf53a6d8fc0056ddbf33dff90449b7b79bec0f4c24dbf89088e824119",
-        "DiffID": "sha256:a306450ba317c1fbaeec6ad3d7c7f145ae508d6f90ecfdb41a5e8e7773e8bb5a"
+        "Digest": "sha256:2377a9cbc345dfe8f16c9c2a3723e763b19216b820ec63487693b02c048dfeae",
+        "DiffID": "sha256:d262770cd072ab9e874a22f66dedd2f609f492f2d2896572fe5e5f949ed3914c"
       },
       {
         "Size": 2560,
-        "Digest": "sha256:84dd4c0b83293edfcd3596f1229ae5641d90a91b609c8cc0c6810cc582962509",
-        "DiffID": "sha256:bd7489119417dec416f2ea788ec7033b137ef37ac95a536724ef1775a8914cab"
+        "Digest": "sha256:5a3663bd1279b6f09739a45cba0304271cc568e5b367ac5ebf9ef5586d832299",
+        "DiffID": "sha256:781abe2ff34ec2ffbd571519c73a7137a1c0b11a3adaf4a2395a1a5841fc053e"
       },
       {
-        "Size": 7052800,
-        "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-        "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+        "Size": 7912960,
+        "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+        "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
       },
       {
-        "Size": 241664,
-        "Digest": "sha256:547ec3fb9daae19400a222571c8e4ff7906e26b6b438989fb7811ed12c5660d7",
-        "DiffID": "sha256:15e3f45c4c67288f2009c119dfd1a2aa6cd539093d8e6878ec9079cd28c3f2dc"
+        "Size": 257024,
+        "Digest": "sha256:1c5185293a3ede67e99eb80865ca760857ec0ca114496fdb4925a7c3436d8f34",
+        "DiffID": "sha256:f48e31dd25c5558345cf448d67fb1887e2af961a2deee3ec7bcd4081f8636b16"
       },
       {
         "Size": 9216,
-        "Digest": "sha256:3e634e9148886d6e699654bc9f3b47a43c01f8191ff8f73cc304ef254c038add",
-        "DiffID": "sha256:5a20ee8210556d791b5c5b94260916260534d47b966b7b6c6c2b245b14feeae1"
-      },
-      {
-        "Size": 1024,
-        "Digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
-        "DiffID": "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+        "Digest": "sha256:e0410b51ff919154e5a463c4107c63e08f6acc69eeaabd8bc0bafdb06fdaa159",
+        "DiffID": "sha256:e2dd1adf01ea8e1e1421d911f0f466f68784bdf984a403a6edd603e333d39dfb"
       }
     ]
   },
   "Results": [
     {
-      "Target": "water-quality-monitor:1.2.0 (alpine 3.24.2)",
+      "Target": "water-quality-monitor:6 (alpine 3.24.2)",
       "Class": "os-pkgs",
       "Type": "alpine",
       "Packages": [
@@ -1594,8 +1569,8 @@
           ],
           "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
           "Layer": {
-            "Digest": "sha256:48865f2bf53a6d8fc0056ddbf33dff90449b7b79bec0f4c24dbf89088e824119",
-            "DiffID": "sha256:a306450ba317c1fbaeec6ad3d7c7f145ae508d6f90ecfdb41a5e8e7773e8bb5a"
+            "Digest": "sha256:2377a9cbc345dfe8f16c9c2a3723e763b19216b820ec63487693b02c048dfeae",
+            "DiffID": "sha256:d262770cd072ab9e874a22f66dedd2f609f492f2d2896572fe5e5f949ed3914c"
           },
           "Digest": "sha1:fb102670f3c39367ab79377b184dcdabc4365af8",
           "InstalledFiles": [
@@ -2256,8 +2231,8 @@
             "musl@1.2.6-r2"
           ],
           "Layer": {
-            "Digest": "sha256:48865f2bf53a6d8fc0056ddbf33dff90449b7b79bec0f4c24dbf89088e824119",
-            "DiffID": "sha256:a306450ba317c1fbaeec6ad3d7c7f145ae508d6f90ecfdb41a5e8e7773e8bb5a"
+            "Digest": "sha256:2377a9cbc345dfe8f16c9c2a3723e763b19216b820ec63487693b02c048dfeae",
+            "DiffID": "sha256:d262770cd072ab9e874a22f66dedd2f609f492f2d2896572fe5e5f949ed3914c"
           },
           "Digest": "sha1:8cfdc97165598834c9e85a2f84b0a1f0cf10b752",
           "InstalledFiles": [
@@ -2284,10 +2259,27 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/flask-3.1.3.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "Flask-WTF",
+          "Identifier": {
+            "PURL": "pkg:pypi/flask-wtf@1.3.0",
+            "UID": "7cd20aaba6cf207f"
+          },
+          "Version": "1.3.0",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "Layer": {
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
+          },
+          "FilePath": "usr/local/lib/python3.12/site-packages/flask_wtf-1.3.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
         },
         {
@@ -2301,8 +2293,8 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/jinja2-3.1.6.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2318,10 +2310,27 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/markupsafe-3.0.4.dist-info/METADATA",
+          "AnalyzedBy": "python-pkg"
+        },
+        {
+          "Name": "WTForms",
+          "Identifier": {
+            "PURL": "pkg:pypi/wtforms@3.2.2",
+            "UID": "1e6bf4c480f088ca"
+          },
+          "Version": "3.2.2",
+          "Licenses": [
+            "BSD-3-Clause"
+          ],
+          "Layer": {
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
+          },
+          "FilePath": "usr/local/lib/python3.12/site-packages/wtforms-3.2.2.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
         },
         {
@@ -2335,8 +2344,8 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/werkzeug-3.1.9.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2352,8 +2361,8 @@
             "MIT"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/blinker-1.9.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2369,8 +2378,8 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/click-8.5.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2386,8 +2395,8 @@
             "MIT"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/gunicorn-26.2.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"
@@ -2403,8 +2412,8 @@
             "BSD-3-Clause"
           ],
           "Layer": {
-            "Digest": "sha256:c459725708c8c50b030c66018538cea461a4eb0dce54db8407185d7ebc58ccaa",
-            "DiffID": "sha256:1d6b5cb0c0bdc0b68ce14eb916295c6e688424c05a13a3dfc4b28ad1971311c3"
+            "Digest": "sha256:6a1140826be7178cdfc31eacc414d95e6077bab5516071c644e5abcc3e64051c",
+            "DiffID": "sha256:a1cde0adc5d89c8514e963c3a21d1fc39eb6fda75332a531f05ee429966c0f60"
           },
           "FilePath": "usr/local/lib/python3.12/site-packages/itsdangerous-2.2.0.dist-info/METADATA",
           "AnalyzedBy": "python-pkg"

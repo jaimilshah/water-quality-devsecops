@@ -58,7 +58,8 @@ terraform destroy                    # when finished
 |---|---|---|---|
 | 1.0.0 baseline | python:3.12-slim (Debian 13) | 44 | 169 |
 | 1.1.0 | python:3.12-alpine + pip upgrade | 4 | 7 |
-| **1.2.0 final** | alpine + `apk upgrade`, pip removed | **0** | **0** |
+| **1.3.0 final** | alpine + `apk upgrade`, pip removed, CSRF added | **0** | **0** |
 
 Terraform and Dockerfile config scan: 0 failures (one documented, accepted egress rule).
+SonarQube: first scan found 1 CSRF vulnerability, 3 bugs, 1 code smell (Security D); all fixed, re-scan is A/A/A with 98.6% coverage.
 See `docs/vulnerability_report.md`.

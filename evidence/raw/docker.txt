@@ -1,18 +1,15 @@
-$ docker images water-quality-monitor
+$ docker images water-quality-monitor   # image built by Jenkins build #6
 REPOSITORY              TAG       SIZE
-water-quality-monitor   1.2.0     100MB
-water-quality-monitor   1.1.0     115MB
-water-quality-monitor   1.0.0     213MB
+water-quality-monitor   6         102MB
+water-quality-monitor   5         102MB
+water-quality-monitor   4         101MB
 
-$ docker run -d --name wq -p 8080:8000 --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges water-quality-monitor:1.2.0
-98f600215035
+$ docker ps --filter name=wq-deployed   # container deployed by the pipeline
+NAMES         IMAGE                     STATUS                   PORTS
+wq-deployed   water-quality-monitor:6   Up 4 minutes (healthy)   0.0.0.0:8081->8000/tcp, [::]:8081->8000/tcp
 
-$ docker ps --filter name=wq
-NAMES     IMAGE                         STATUS                    PORTS
-wq        water-quality-monitor:1.2.0   Up 10 seconds (healthy)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp
-
-$ docker exec wq id   # runs as non-root
+$ docker exec wq-deployed id   # runs as non-root
 uid=100(appuser) gid=65533(nogroup) groups=65533(nogroup)
 
-$ curl localhost:8080/health
-{"status":"ok"}
+$ docker inspect wq-deployed   # runtime hardening
+ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges]

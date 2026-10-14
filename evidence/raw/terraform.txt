@@ -1,5 +1,4 @@
-$ terraform fmt -check && terraform validate
-formatting OK
+$ terraform validate
 Success! The configuration is valid.
 
 
@@ -17,6 +16,6 @@ aws_vpc_security_group_egress_rule.https_out
 aws_vpc_security_group_ingress_rule.http
 
 $ terraform output
-instance_id = "i-0b1166064febfea4f"
-public_ip = "3.110.125.245"
-website_url = "http://3.110.125.245"
+instance_id = "i-0d5a0585ad95df179"
+public_ip = "3.6.150.185"
+website_url = "http://3.6.150.185"

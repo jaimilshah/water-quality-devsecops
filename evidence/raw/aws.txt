@@ -1,13 +1,13 @@
-$ aws ec2 describe-instances --instance-ids i-0b1166064febfea4f
+$ aws ec2 describe-instances --instance-ids i-0d5a0585ad95df179
 IMDSv2: required
 Monitoring: enabled
+Name: wq-monitor-web
 Profile: arn:aws:iam::<account>:instance-profile/wq-monitor-ec2-20261014181841593800000003
-PublicIp: 3.110.125.245
+PublicIp: 3.6.150.185
 State: running
-Tags: wq-monitor-web
 Type: t3.micro
 
-$ aws ec2 describe-volumes (root volume)
+$ aws ec2 describe-volumes   # root volume
 Encrypted: true
 Size: 8
 Type: gp3
@@ -20,5 +20,9 @@ Ingress:
 - Cidr: 0.0.0.0/0
   Port: 80
 
-$ curl http://3.110.125.245/health
+$ curl http://3.6.150.185/health
 {"status":"ok"}
+
+
+$ curl -X POST -F file=@sample.csv http://3.6.150.185/api/process   # no CSRF token
+{"error":"Missing or invalid CSRF token"}
