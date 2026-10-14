@@ -9,13 +9,15 @@ pipeline {
   }
 
   parameters {
+    string(name: 'TRIVY_CACHE', defaultValue: 'trivy-cache',
+           description: 'Docker volume name or host path used as the Trivy DB cache')
     booleanParam(name: 'DEPLOY_TO_AWS', defaultValue: false,
                  description: 'Run terraform apply (needs AWS credentials in Jenkins and manual approval)')
   }
 
   environment {
     IMAGE = "water-quality-monitor:${env.BUILD_NUMBER}"
-    TRIVY_RUN = 'docker run --rm -v trivy-cache:/root/.cache/'
+    TRIVY_RUN = "docker run --rm -v ${params.TRIVY_CACHE}:/root/.cache/trivy"
     TRIVY_IMG = 'aquasec/trivy:latest'
   }
 
