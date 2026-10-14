@@ -1,0 +1,46 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a13b7d-2192-7484-bf11-0a6481653bcc",
+  "CreatedAt": "2026-10-14T23:06:58.770298+05:30",
+  "ArtifactID": "sha256:b1f23bd3fe1e7c23e811e1887bda89376f1acc367597b999e8cc02b03b30b622",
+  "ArtifactName": ".",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "Branch": "main",
+    "Tags": [
+      "v1.0.0-baseline"
+    ],
+    "Commit": "8f184afc207f90d3c8234dad5b8229bb97d996fe",
+    "CommitMsg": "feat: Flask water-quality dashboard with tests, Dockerfile and baseline Trivy report",
+    "Author": "Jaimil Shah \u003cJames@Yashvis-MacBook-Air.local\u003e",
+    "Committer": "Jaimil Shah \u003cJames@Yashvis-MacBook-Air.local\u003e"
+  },
+  "Results": [
+    {
+      "Target": "Dockerfile",
+      "Class": "config",
+      "Type": "dockerfile",
+      "MisconfSummary": {
+        "Successes": 27,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "terraform",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 70,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "terraform/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    }
+  ]
+}

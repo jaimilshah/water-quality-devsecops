@@ -1,0 +1,48 @@
+# Local CI stack: Jenkins + SonarQube.
+# Usage (from this folder):
+#   export JENKINS_HOME_DIR="$HOME/wq-jenkins-home"          # same path inside & outside the container
+#   export JENKINS_ADMIN_PASSWORD='choose-your-own'          # never committed
+#   export SONAR_TOKEN='token-from-sonarqube'                # optional until generated
+#   docker compose up -d --build
+name: wq-ci
+
+services:
+  sonarqube:
+    image: sonarqube:community
+    ports:
+      - "127.0.0.1:9000:9000"
+    environment:
+      SONAR_SEARCH_JAVAADDITIONALOPTS: "-Dnode.store.allow_mmap=false"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_extensions:/opt/sonarqube/extensions
+    networks: [ci-net]
+
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    user: root
+    ports:
+      - "127.0.0.1:8090:8080"
+    environment:
+      JENKINS_HOME: "${JENKINS_HOME_DIR:?set JENKINS_HOME_DIR}"
+      JENKINS_ADMIN_PASSWORD: "${JENKINS_ADMIN_PASSWORD:?set JENKINS_ADMIN_PASSWORD}"
+      SONAR_TOKEN: "${SONAR_TOKEN:-unset}"
+      REPO_URL: "${REPO_URL:-file:///repo}"
+    volumes:
+      - "${JENKINS_HOME_DIR}:${JENKINS_HOME_DIR}"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ..:/repo:ro
+    networks: [ci-net]
+    depends_on: [sonarqube]
+
+volumes:
+  sonar_data:
+  sonar_logs:
+  sonar_extensions:
+
+networks:
+  ci-net:
+    name: wq-ci-net

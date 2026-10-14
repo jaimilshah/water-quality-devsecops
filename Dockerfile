@@ -1,4 +1,6 @@
-FROM python:3.12-slim
+# Hardened image: minimal Alpine base, patched OS packages, no package manager
+# in the runtime layer, non-root runtime user.
+FROM python:3.12-alpine
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -6,12 +8,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /srv
 
+RUN apk upgrade --no-cache
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt \
+ && pip uninstall -y pip
 
 COPY app/ ./app/
 
-RUN useradd --system --no-create-home --shell /usr/sbin/nologin appuser
+RUN adduser -S -D -H -s /sbin/nologin appuser
 USER appuser
 
 WORKDIR /srv/app
