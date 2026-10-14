@@ -344,3 +344,5 @@ footer code {
 .muted { color: var(--muted); }
 .error-msg { color: #ff8a80; font-size: 0.85rem; margin: 12px 0 0; }
 .live-dot.busy { background: #f9a825; }
+
+.strip-legend { flex-wrap: wrap; }

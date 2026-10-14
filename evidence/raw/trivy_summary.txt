@@ -1,0 +1,4 @@
+$ trivy image water-quality-monitor:<tag>   # result for each image version
+1.0.0 baseline  python:3.12-slim (Debian 13.7)       CRITICAL=0   HIGH=44  MEDIUM=63  LOW=62  TOTAL=169
+1.1.0            python:3.12-alpine + pip upgrade    CRITICAL=0   HIGH=4   MEDIUM=3   LOW=0   TOTAL=7
+1.2.0 FINAL     alpine, patched, pip removed         CRITICAL=0   HIGH=0   MEDIUM=0   LOW=0   TOTAL=0

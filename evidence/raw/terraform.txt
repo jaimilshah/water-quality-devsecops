@@ -1,0 +1,22 @@
+$ terraform fmt -check && terraform validate
+formatting OK
+Success! The configuration is valid.
+
+
+$ terraform state list
+data.aws_iam_policy_document.ec2_assume
+data.aws_ssm_parameter.al2023
+data.aws_subnets.default
+data.aws_vpc.default
+aws_iam_instance_profile.instance
+aws_iam_role.instance
+aws_iam_role_policy_attachment.ssm
+aws_instance.web
+aws_security_group.web
+aws_vpc_security_group_egress_rule.https_out
+aws_vpc_security_group_ingress_rule.http
+
+$ terraform output
+instance_id = "i-0b1166064febfea4f"
+public_ip = "3.110.125.245"
+website_url = "http://3.110.125.245"

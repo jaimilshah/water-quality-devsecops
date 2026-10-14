@@ -1,0 +1,18 @@
+$ docker images water-quality-monitor
+REPOSITORY              TAG       SIZE
+water-quality-monitor   1.2.0     100MB
+water-quality-monitor   1.1.0     115MB
+water-quality-monitor   1.0.0     213MB
+
+$ docker run -d --name wq -p 8080:8000 --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges water-quality-monitor:1.2.0
+98f600215035
+
+$ docker ps --filter name=wq
+NAMES     IMAGE                         STATUS                    PORTS
+wq        water-quality-monitor:1.2.0   Up 10 seconds (healthy)   0.0.0.0:8080->8000/tcp, [::]:8080->8000/tcp
+
+$ docker exec wq id   # runs as non-root
+uid=100(appuser) gid=65533(nogroup) groups=65533(nogroup)
+
+$ curl localhost:8080/health
+{"status":"ok"}
