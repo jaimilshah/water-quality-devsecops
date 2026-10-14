@@ -1,0 +1,78 @@
+{
+ "evidence/aws_website_live.png": [
+  1920,
+  2886
+ ],
+ "evidence/jenkins_console_build6.jpg": [
+  800,
+  627
+ ],
+ "evidence/jenkins_stage_view_left.jpg": [
+  800,
+  525
+ ],
+ "evidence/jenkins_stage_view_right.jpg": [
+  800,
+  525
+ ],
+ "evidence/sonar_after.jpg": [
+  800,
+  627
+ ],
+ "evidence/sonar_before.jpg": [
+  800,
+  627
+ ],
+ "evidence/term_aws.png": [
+  1226,
+  942
+ ],
+ "evidence/term_docker.png": [
+  1460,
+  552
+ ],
+ "evidence/term_pytest.png": [
+  1100,
+  432
+ ],
+ "evidence/term_terraform.png": [
+  1100,
+  732
+ ],
+ "evidence/term_trivy_baseline.png": [
+  1629,
+  1152
+ ],
+ "evidence/term_trivy_final.png": [
+  1629,
+  1062
+ ],
+ "evidence/term_trivy_fs.png": [
+  1629,
+  1092
+ ],
+ "evidence/term_trivy_summary.png": [
+  1447,
+  222
+ ],
+ "diagrams/architecture.png": [
+  2080,
+  1152
+ ],
+ "diagrams/cicd_workflow.png": [
+  2240,
+  1152
+ ],
+ "/Users/James/Downloads/WaterQualityMonitor_SEPM/jira_board_screenshot.jpg": [
+  800,
+  379
+ ],
+ "evidence/jira_list_tasks.jpg": [
+  800,
+  627
+ ],
+ "evidence/jira_list_status.jpg": [
+  800,
+  627
+ ]
+}

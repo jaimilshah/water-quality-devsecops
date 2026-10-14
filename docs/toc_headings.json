@@ -1,0 +1,162 @@
+[
+ {
+  "level": 1,
+  "text": "1. Introduction"
+ },
+ {
+  "level": 2,
+  "text": "1.1 Alignment with SDG 9 and SDG 6"
+ },
+ {
+  "level": 2,
+  "text": "1.2 What was built"
+ },
+ {
+  "level": 1,
+  "text": "2. Problem Definition and Scope"
+ },
+ {
+  "level": 2,
+  "text": "2.1 Problem Definition"
+ },
+ {
+  "level": 2,
+  "text": "2.2 Objectives"
+ },
+ {
+  "level": 2,
+  "text": "2.3 Scope"
+ },
+ {
+  "level": 1,
+  "text": "3. Design and Methodology"
+ },
+ {
+  "level": 2,
+  "text": "3.1 Application Architecture"
+ },
+ {
+  "level": 2,
+  "text": "3.2 DevSecOps Workflow"
+ },
+ {
+  "level": 2,
+  "text": "3.3 Tools and Justification"
+ },
+ {
+  "level": 2,
+  "text": "3.4 Security-by-Design Decisions"
+ },
+ {
+  "level": 2,
+  "text": "3.5 Project Management"
+ },
+ {
+  "level": 1,
+  "text": "4. Implementation and Results"
+ },
+ {
+  "level": 2,
+  "text": "4.1 Website"
+ },
+ {
+  "level": 2,
+  "text": "4.2 Testing"
+ },
+ {
+  "level": 2,
+  "text": "4.3 Version Control (GitHub)"
+ },
+ {
+  "level": 2,
+  "text": "4.4 Docker"
+ },
+ {
+  "level": 2,
+  "text": "4.5 Jenkins CI/CD Pipeline"
+ },
+ {
+  "level": 2,
+  "text": "4.6 AWS Infrastructure with Terraform"
+ },
+ {
+  "level": 1,
+  "text": "5. Security Assessment and Basic Vulnerability Report"
+ },
+ {
+  "level": 2,
+  "text": "5.1 Scan Scope"
+ },
+ {
+  "level": 2,
+  "text": "5.2 SonarQube Findings"
+ },
+ {
+  "level": 2,
+  "text": "5.3 Trivy Image and Dependency Findings"
+ },
+ {
+  "level": 2,
+  "text": "5.4 Infrastructure-as-Code Findings"
+ },
+ {
+  "level": 2,
+  "text": "5.5 Summary and Residual Risk"
+ },
+ {
+  "level": 1,
+  "text": "6. Analysis and Interpretation"
+ },
+ {
+  "level": 2,
+  "text": "6.1 Testing Results"
+ },
+ {
+  "level": 2,
+  "text": "6.2 Pipeline Performance"
+ },
+ {
+  "level": 2,
+  "text": "6.3 Security Findings"
+ },
+ {
+  "level": 2,
+  "text": "6.4 Challenges and Lessons"
+ },
+ {
+  "level": 1,
+  "text": "7. Conclusion and Future Scope"
+ },
+ {
+  "level": 2,
+  "text": "7.1 Conclusion"
+ },
+ {
+  "level": 2,
+  "text": "7.2 Future Scope"
+ },
+ {
+  "level": 1,
+  "text": "8. References"
+ },
+ {
+  "level": 1,
+  "text": "9. Project Reflection"
+ },
+ {
+  "level": 1,
+  "text": "10. Evidence of Completion"
+ },
+ {
+  "level": 2,
+  "text": "10.1 Links"
+ },
+ {
+  "level": 2,
+  "text": "10.2 Project Tracking"
+ },
+ {
+  "level": 2,
+  "text": "10.3 How to Reproduce"
+ }
+]

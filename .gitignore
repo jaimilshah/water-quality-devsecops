@@ -11,3 +11,6 @@ terraform/*.tfvars
 !terraform/terraform.tfvars.example
 node_modules/
 .DS_Store
+
+# submission documents are kept local
+deliverables/
