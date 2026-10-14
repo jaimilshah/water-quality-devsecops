@@ -41,8 +41,9 @@ pipeline {
       steps {
         withSonarQubeEnv('sonarqube') {
           sh '''
-            docker run --rm --network wq-ci-net -e SONAR_HOST_URL -e SONAR_TOKEN="${SONAR_AUTH_TOKEN:-$SONAR_TOKEN}" \
-              -v "$PWD":/usr/src sonarsource/sonar-scanner-cli:latest
+            docker run --rm -u 0 --network wq-ci-net -e SONAR_HOST_URL -e SONAR_TOKEN="${SONAR_AUTH_TOKEN:-$SONAR_TOKEN}" \
+              -v "$PWD":/usr/src sonarsource/sonar-scanner-cli:latest \
+              -Dsonar.working.directory=/usr/src/.scannerwork
           '''
         }
       }
