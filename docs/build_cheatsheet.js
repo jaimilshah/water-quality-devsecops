@@ -48,7 +48,7 @@ add(
   ]),
   P("", { after: 40 }),
   P("Project folder: /Users/James/Downloads/WaterQualityDevSecOps   |   GitHub: github.com/jaimilshah/water-quality-devsecops", { size: 19 }),
-  code(["app/            the website (Flask), templates and static files", "tests/          31 automatic tests", "Dockerfile      how the box is built", "Jenkinsfile     the pipeline steps", "ci/             Jenkins + SonarQube stack (docker-compose)", "terraform/      the AWS server recipe", "reports/ docs/ evidence/ diagrams/   scan results, report, screenshots"]));
+  code(["app/            the website (Flask), templates and static files", "tests/          31 automatic tests", "Dockerfile      how the box is built", "Jenkinsfile     the pipeline steps", "ci/             Jenkins + SonarQube (Dockerfile + docker run)", "terraform/      the AWS server recipe", "reports/ docs/ evidence/ diagrams/   scan results, report, screenshots"]));
 
 add(H1("1. Build the website and test it"),
   P("What we did: wrote a Flask web app with a dashboard, a CSV upload and a simulate button, using the same SAFE / WARNING / UNSAFE rules as phase one."),
@@ -83,28 +83,26 @@ add(H1("4. Trivy (security scanner)"),
 
 add(H1("5. Jenkins and SonarQube (the automatic factory)"),
   H2("5.1 Start the tools"),
-  code(["cd ci", "./start.sh        # asks for a Jenkins password and a SonarQube token (hidden typing)", "                  # starts Jenkins at :8090 and SonarQube at :9000", "docker ps         # check both containers are running", "", "# After a computer restart, the containers need starting again:", "docker start wq-ci-sonarqube-1 wq-ci-jenkins-1"]),
-  P("Jenkins is set up as code (JCasC file ci/jenkins.yaml): it creates the admin user, links to SonarQube and creates the pipeline job automatically, so no secret is stored in a file."),
+  code(["cd ci", "docker network create wq-ci-net            # shared network", "", "# SonarQube (official LTS Community image)", "docker run -d --name sonarqube --network wq-ci-net -p 9000:9000 \\", "  -e SONAR_SEARCH_JAVAADDITIONALOPTS=\"-Dnode.store.allow_mmap=false\" -e SONAR_VALIDATEWEBHOOKS=false \\", "  -v sonarqube_data:/opt/sonarqube/data sonarqube:lts-community", "", "# Jenkins (our own image from ci/Dockerfile)", "docker build -t jenkins-docker:lts .", "docker run -d --name jenkins --user root --network wq-ci-net -p 8090:8080 \\", "  -e JENKINS_HOME=$HOME/jenkins_home -v $HOME/jenkins_home:$HOME/jenkins_home \\", "  -v /var/run/docker.sock:/var/run/docker.sock jenkins-docker:lts", "", "docker ps                      # both running", "docker start sonarqube jenkins # after a computer restart"]),
+  P("Jenkins is then configured in the browser: add three credentials (sonar-token, aws-access-key-id, aws-secret-access-key), add the SonarQube server (name sonarqube, URL http://sonarqube:9000), and create a Pipeline job from SCM pointing at the GitHub repo and the file Jenkinsfile. Full steps are in ci/README.md."),
   H2("5.2 SonarQube first-time setup (in the browser)"),
   bullet("Open http://localhost:9000, log in as admin / admin, and set a new password when asked."),
-  bullet("Top-right profile, My Account, Security, Generate Token: choose Global Analysis Token. Copy it (shown once) and give it to start.sh."),
+  bullet("Top-right profile, My Account, Security, Generate Token: choose Global Analysis Token. Copy it (shown once) and add it in Jenkins as the credential sonar-token."),
   bullet("Administration, Configuration, Webhooks, Create: name jenkins, URL http://jenkins:8080/sonarqube-webhook/ . This lets Jenkins hear the quality-gate result."),
   bullet("In this local lab SonarQube blocks webhooks to private addresses, so the setting SONAR_VALIDATEWEBHOOKS=false was added to its container (lab only)."),
   H2("5.3 The pipeline (Jenkinsfile)"),
   table([500, 3000, 5500], ["#", "Stage", "What it does"], [
-    ["1", "Checkout", "Downloads the code from GitHub"],
-    ["2", "Unit tests + coverage", "Runs pytest in a container"],
-    ["3", "SonarQube analysis", "Sends the code to SonarQube to be checked"],
-    ["4", "Quality gate", "Stops the build if SonarQube says the code is not good enough"],
-    ["5", "Trivy: dependencies, secrets, IaC", "Fails on any HIGH or CRITICAL finding"],
-    ["6", "Docker build", "Builds the box, tagged with the build number"],
-    ["7", "Trivy: image scan", "Scans the finished box; fails on HIGH or CRITICAL"],
-    ["8", "Terraform validate", "Checks the AWS recipe is correct"],
-    ["9", "Deploy (Docker)", "Starts the box and checks /health"],
-    ["10", "Terraform apply (AWS)", "Optional, needs approval"],
+    ["1", "Checkout", "Downloads the code from GitHub (BRANCH parameter, default main)"],
+    ["2", "Unit Tests", "Runs pytest with coverage in a container"],
+    ["3", "SonarQube Scan", "Sends the code to SonarQube to be checked"],
+    ["4", "Quality Gate", "Stops the build if SonarQube says the code is not good enough"],
+    ["5", "Build Docker Image", "Builds the box, tagged with the build number"],
+    ["6", "Trivy Scan", "Makes an HTML + JSON report; fails on any HIGH or CRITICAL finding"],
+    ["7", "Push to AWS ECR", "Logs in to AWS public ECR and pushes the image (build number + latest)"],
+    ["8", "Deploy", "Runs the image and checks /health"],
   ]),
   P("", { after: 40 }),
-  P("Run a build: open http://localhost:8090, log in, open the job water-quality-monitor, click Build with Parameters (keep DEPLOY_TO_AWS unticked), then watch the Stage View. Console Output shows every command."),
+  P("Run a build: open http://localhost:8090, log in, open the job water-quality-monitor, click Build with Parameters (BRANCH = main), then watch the Stage View. Console Output shows every command. The Trivy HTML report is under Build Artifacts."),
   H2("5.4 What SonarQube found, and what we changed"),
   table([2900, 2900, 3200], ["Finding", "Why it matters", "Fix"], [
     ["No CSRF protection on upload (CRITICAL)", "Another website could trick a visitor's browser into sending data to ours", "Flask-WTF token on every POST; returns 400 without it"],
@@ -149,7 +147,7 @@ add(H1("8. Problems we hit and how they were fixed"),
   ]));
 
 add(H1("9. Quick reference for the demo"),
-  code(["# website running locally in Docker (made by Jenkins):  http://localhost:8081", "# Jenkins:    http://localhost:8090        SonarQube: http://localhost:9000", "# After a restart:  docker start wq-ci-sonarqube-1 wq-ci-jenkins-1", "", "# Show the cloud step again (about 3 min, then destroy it):", "cd /Users/James/Downloads/WaterQualityDevSecOps/terraform", "terraform plan -out=tfplan && terraform apply tfplan", "terraform output website_url"]),
+  code(["# website running locally in Docker (made by Jenkins):  http://localhost:8081", "# Jenkins:    http://localhost:8090        SonarQube: http://localhost:9000", "# After a restart:  docker start sonarqube jenkins", "", "# Show the cloud step again (about 3 min, then destroy it):", "cd /Users/James/Downloads/WaterQualityDevSecOps/terraform", "terraform plan -out=tfplan && terraform apply tfplan", "terraform output website_url"]),
   P("Numbers to remember: 169 to 0 (Docker weaknesses), 213 to 102 MB (box size), 31 tests, 99% coverage, 1 real security flaw found by SonarQube and fixed.", { bold: true }));
 
 const doc = new Document({

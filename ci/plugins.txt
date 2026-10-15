@@ -1,9 +1,0 @@
-workflow-aggregator
-git
-sonar
-junit
-credentials-binding
-pipeline-stage-view
-timestamper
-configuration-as-code
-job-dsl

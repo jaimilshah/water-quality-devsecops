@@ -11,7 +11,7 @@ A Flask web application that validates, classifies and raises alerts on water-qu
 | Tests | pytest + coverage (99%, 31 tests incl. CSRF) | `tests/` |
 | Version control | Git + GitHub | this repo |
 | Containerisation | Docker (Alpine, non-root, no pip in runtime) | `Dockerfile` |
-| CI/CD | Jenkins declarative pipeline | `Jenkinsfile`, `ci/` |
+| CI/CD | Jenkins declarative pipeline, image pushed to AWS ECR | `Jenkinsfile`, `ci/` |
 | Infrastructure | Terraform on AWS (EC2 + SG + IAM/SSM) | `terraform/` |
 | Code quality / SAST | SonarQube | `sonar-project.properties` |
 | Dependency, image, IaC scanning | Trivy | `reports/` |
@@ -36,12 +36,16 @@ curl localhost:8080/health
 
 ## CI stack (Jenkins + SonarQube)
 
+Plain Docker commands, no compose file. Full steps in [`ci/README.md`](ci/README.md).
+
 ```bash
 cd ci
-export JENKINS_HOME_DIR="$HOME/wq-jenkins-home"
-export JENKINS_ADMIN_PASSWORD='<choose one>'
-export SONAR_TOKEN='<token generated in SonarQube>'
-docker compose up -d --build        # Jenkins :8090, SonarQube :9000
+docker network create wq-ci-net
+docker run -d --name sonarqube --network wq-ci-net -p 9000:9000 sonarqube:lts-community
+docker build -t jenkins-docker:lts .
+docker run -d --name jenkins --user root --network wq-ci-net -p 8090:8080 \
+  -e JENKINS_HOME=$HOME/jenkins_home -v $HOME/jenkins_home:$HOME/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock jenkins-docker:lts
 ```
 
 ## Deploy to AWS
