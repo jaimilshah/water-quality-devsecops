@@ -116,22 +116,19 @@ add(H1("5. Jenkins and SonarQube (the automatic factory)"),
 
 add(H1("6. Terraform and AWS (the cloud server)"),
   H2("6.1 One-time setup"),
-  code(["brew tap hashicorp/tap && brew install hashicorp/tap/terraform", "aws configure          # type the access key, secret, region ap-south-1, format json", "aws sts get-caller-identity       # proves the login works (shows account, no secrets)"]),
+  code(["brew tap hashicorp/tap && brew install hashicorp/tap/terraform", "aws configure          # type the access key, secret, region ap-south-1, format json", "aws sts get-caller-identity       # proves the login works (shows account, no secrets)", "", "# SSH key pair used to log in to the server (saved on your computer)", "aws ec2 create-key-pair --key-name wq-key --region ap-south-1 --query KeyMaterial --output text > ~/.ssh/wq-key.pem", "chmod 400 ~/.ssh/wq-key.pem"]),
   H2("6.2 The recipe (terraform/ folder)"),
   table([2600, 6400], ["File", "What it holds"], [
     ["versions.tf", "Which cloud provider (AWS) and which region"],
-    ["variables.tf", "Settings you can change: region, server size, GitHub address"],
-    ["main.tf", "The 7 resources: server (EC2), firewall (security group) + its 2 rules, IAM role + policy + instance profile"],
-    ["user_data.sh.tftpl", "Startup script: install Docker, download the code from GitHub, build and run the box"],
-    ["outputs.tf", "Prints the server's address when finished"],
+    ["variables.tf", "Settings: key_name (required), region, server size, which ECR image to run"],
+    ["main.tf", "The 7 resources: VPC, public subnet, internet gateway, route table + association, security group (ports 22 and 80), Ubuntu 24.04 EC2 server"],
+    ["outputs.tf", "Prints the server's public IP and website address"],
   ]),
   P("", { after: 40 }),
-  P("Safety choices in main.tf: IMDSv2 required (http_tokens = required), encrypted disk, no SSH door (admin through AWS Systems Manager), firewall allows only port 80 in and port 443 out."),
+  P("What the server does on first boot (the user_data in main.tf): installs Docker, then runs the image from AWS ECR with: docker run -d --name wq --restart always -p 80:8000 public.ecr.aws/v0x5n8i4/water-quality-monitor:latest"),
   H2("6.3 Create, check and remove"),
-  code(["cd terraform", "terraform init                         # download the AWS plugin (once)", "terraform fmt -check && terraform validate   # formatting and correctness", "terraform plan -out=tfplan             # preview: should say \"7 to add\"", "terraform apply tfplan                 # create it (about 15 seconds)", "terraform output website_url           # the web address", "curl $(terraform output -raw website_url)/health   # wait ~3 min after apply", "", "# when finished - removes everything so nothing is charged:", "terraform plan -destroy -out=d.tfplan && terraform apply d.tfplan"]),
-  H2("6.4 Proof commands"),
-  code(["aws ec2 describe-instances --instance-ids <id>        # state, IMDSv2, volume", "aws ec2 describe-security-groups --group-ids <sg-id>    # only port 80 in, 443 out", "terraform state list                                    # the 7 resources"]),
-  say("Terraform reads my recipe and builds the server, firewall and permissions on AWS. Because it is code, it is repeatable, reviewable, and one command removes it."));
+  code(["cd terraform", "terraform init                                  # download the AWS plugin (once)", "terraform validate                              # is the recipe correct?", "terraform plan -var=\"key_name=wq-key\"           # preview: should say 7 to add", "terraform apply -var=\"key_name=wq-key\"          # create it; type yes", "terraform output                                # public IP and website address", "curl http://<public-ip>/health                  # wait ~3 min after apply", "ssh -i ~/.ssh/wq-key.pem ubuntu@<public-ip>     # log in to the server", "docker ps                                       # (on the server) the container from ECR is running", "", "# when finished - removes everything so nothing is charged:", "terraform destroy -var=\"key_name=wq-key\""]),
+  say("Terraform builds a network and an Ubuntu server on AWS from code. The server pulls the image that Jenkins pushed to ECR and runs it. The same image, from build to cloud."));
 
 add(H1("7. JIRA (project tracking)"),
   P("Board: jaimilshah24.atlassian.net, project KAN. Tasks DSO-1 to DSO-9 (website, tests, GitHub, Docker, Jenkins, Terraform/AWS, SonarQube, Trivy and report, report/PPT/video) were created and moved from To Do through In Progress to Done."));
@@ -147,7 +144,7 @@ add(H1("8. Problems we hit and how they were fixed"),
   ]));
 
 add(H1("9. Quick reference for the demo"),
-  code(["# website running locally in Docker (made by Jenkins):  http://localhost:8081", "# Jenkins:    http://localhost:8090        SonarQube: http://localhost:9000", "# After a restart:  docker start sonarqube jenkins", "", "# Show the cloud step again (about 3 min, then destroy it):", "cd /Users/James/Downloads/WaterQualityDevSecOps/terraform", "terraform plan -out=tfplan && terraform apply tfplan", "terraform output website_url"]),
+  code(["# website running locally in Docker (made by Jenkins):  http://localhost:8081", "# Jenkins:    http://localhost:8090        SonarQube: http://localhost:9000", "# After a restart:  docker start sonarqube jenkins", "", "# Show the cloud step again (about 3 min, then destroy it):", "cd /Users/James/Downloads/WaterQualityDevSecOps/terraform", "terraform apply -var=\"key_name=wq-key\"   # then: terraform output"]),
   P("Numbers to remember: 169 to 0 (Docker weaknesses), 213 to 102 MB (box size), 31 tests, 99% coverage, 1 real security flaw found by SonarQube and fixed.", { bold: true }));
 
 const doc = new Document({

@@ -1,101 +1,104 @@
-data "aws_vpc" "default" {
-  default = true
+# Network: VPC, public subnet, internet gateway and route table
+resource "aws_vpc" "lab" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  tags                 = { Name = "wq-vpc" }
 }
 
-data "aws_subnets" "default" {
+resource "aws_subnet" "public" {
+  vpc_id                  = aws_vpc.lab.id
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  tags                    = { Name = "wq-public-subnet" }
+}
+
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.lab.id
+  tags   = { Name = "wq-igw" }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.lab.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+  tags = { Name = "wq-public-rt" }
+}
+
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public.id
+  route_table_id = aws_route_table.public.id
+}
+
+# Firewall: SSH for admin, port 80 for the website
+resource "aws_security_group" "lab" {
+  name_prefix = "wq-lab-"
+  description = "SSH and HTTP for the water quality app"
+  vpc_id      = aws_vpc.lab.id
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] #trivy:ignore:AVD-AWS-0107 lab only - SSH is key-based; restrict to your IP in real use
+  }
+
+  ingress {
+    description = "Website"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] #trivy:ignore:AVD-AWS-0107 public website
+  }
+
+  egress {
+    description = "Allow all outbound (package install, pull image from ECR)"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] #trivy:ignore:AVD-AWS-0104 needed to reach apt and ECR
+  }
+
+  tags = { Name = "wq-lab-sg" }
+}
+
+# Latest Ubuntu 24.04 (ARM) from Canonical
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
   filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-arm64-server-*"]
   }
 }
 
-data "aws_ssm_parameter" "al2023" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
-}
-
-# --- Network access ---------------------------------------------------------
-resource "aws_security_group" "web" {
-  name_prefix = "wq-monitor-web-"
-  description = "Public HTTP access to the water quality dashboard (no SSH; admin via SSM)"
-  vpc_id      = data.aws_vpc.default.id
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "http" {
-  security_group_id = aws_security_group.web.id
-  description       = "Public website traffic"
-  from_port         = 80
-  to_port           = 80
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0"
-}
-
-resource "aws_vpc_security_group_egress_rule" "https_out" {
-  security_group_id = aws_security_group.web.id
-  description       = "HTTPS egress for OS and package updates, git clone, image base layers"
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0" #trivy:ignore:AVD-AWS-0104 required to reach package mirrors and GitHub
-}
-
-# --- Instance identity: SSM Session Manager instead of SSH keys ---------------
-data "aws_iam_policy_document" "ec2_assume" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "instance" {
-  name_prefix        = "wq-monitor-ec2-"
-  assume_role_policy = data.aws_iam_policy_document.ec2_assume.json
-}
-
-resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = aws_iam_role.instance.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "instance" {
-  name_prefix = "wq-monitor-ec2-"
-  role        = aws_iam_role.instance.name
-}
-
-# --- Compute -------------------------------------------------------------------
-resource "aws_instance" "web" {
-  ami                    = data.aws_ssm_parameter.al2023.value
+# The server: installs Docker, pulls our image from ECR and runs it on port 80
+resource "aws_instance" "ubuntu" {
+  ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.instance_type
-  subnet_id              = data.aws_subnets.default.ids[0]
-  vpc_security_group_ids = [aws_security_group.web.id]
-  iam_instance_profile   = aws_iam_instance_profile.instance.name
-  monitoring             = true
+  subnet_id              = aws_subnet.public.id
+  vpc_security_group_ids = [aws_security_group.lab.id]
+  key_name               = var.key_name
 
   metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required" # enforce IMDSv2
+    http_tokens = "required" # IMDSv2
   }
 
   root_block_device {
-    volume_type = "gp3"
     volume_size = 8
     encrypted   = true
   }
 
-  user_data_replace_on_change = true
-  user_data = templatefile("${path.module}/user_data.sh.tftpl", {
-    repo_url = var.repo_url
-    repo_ref = var.repo_ref
-    app_port = var.app_port
-  })
+  user_data = <<-EOT
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y docker.io
+    systemctl enable --now docker
+    docker run -d --name wq --restart always -p 80:8000 ${var.image}
+  EOT
 
-  tags = {
-    Name = "wq-monitor-web"
-  }
+  user_data_replace_on_change = true
+  tags                        = { Name = "wq-ubuntu-server" }
 }

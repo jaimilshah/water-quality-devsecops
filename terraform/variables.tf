@@ -1,3 +1,8 @@
+variable "key_name" {
+  description = "Name of an existing EC2 key pair (used to SSH in as the ubuntu user)"
+  type        = string
+}
+
 variable "aws_region" {
   description = "AWS region to deploy into"
   type        = string
@@ -5,25 +10,13 @@ variable "aws_region" {
 }
 
 variable "instance_type" {
-  description = "EC2 instance type (t3.micro is free-tier eligible)"
+  description = "EC2 instance type. t4g = ARM, matching the image that Jenkins builds on an Apple-silicon Mac"
   type        = string
-  default     = "t3.micro"
+  default     = "t4g.micro"
 }
 
-variable "repo_url" {
-  description = "Public Git repository the instance clones and builds the Docker image from"
+variable "image" {
+  description = "Docker image in AWS public ECR that the server runs"
   type        = string
-  default     = "https://github.com/jaimilshah/water-quality-devsecops.git"
-}
-
-variable "repo_ref" {
-  description = "Git branch or tag to deploy"
-  type        = string
-  default     = "main"
-}
-
-variable "app_port" {
-  description = "Port the container listens on"
-  type        = number
-  default     = 8000
+  default     = "public.ecr.aws/v0x5n8i4/water-quality-monitor:latest"
 }

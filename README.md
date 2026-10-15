@@ -12,7 +12,7 @@ A Flask web application that validates, classifies and raises alerts on water-qu
 | Version control | Git + GitHub | this repo |
 | Containerisation | Docker (Alpine, non-root, no pip in runtime) | `Dockerfile` |
 | CI/CD | Jenkins declarative pipeline, image pushed to AWS ECR | `Jenkinsfile`, `ci/` |
-| Infrastructure | Terraform on AWS (EC2 + SG + IAM/SSM) | `terraform/` |
+| Infrastructure | Terraform on AWS (VPC, subnet, security group, Ubuntu EC2 that pulls the image from ECR) | `terraform/` |
 | Code quality / SAST | SonarQube | `sonar-project.properties` |
 | Dependency, image, IaC scanning | Trivy | `reports/` |
 | Diagrams | architecture + CI/CD workflow | `diagrams/` |
@@ -50,10 +50,18 @@ docker run -d --name jenkins --user root --network wq-ci-net -p 8090:8080 \
 
 ## Deploy to AWS
 
+The server is an Ubuntu EC2 machine. On first boot it installs Docker and runs the image that Jenkins
+pushed to AWS public ECR (`public.ecr.aws/v0x5n8i4/water-quality-monitor:latest`) on port 80.
+
 ```bash
+aws ec2 create-key-pair --key-name wq-key --region ap-south-1 --query KeyMaterial --output text > ~/.ssh/wq-key.pem
+chmod 400 ~/.ssh/wq-key.pem
 cd terraform
-terraform init && terraform plan && terraform apply
-terraform destroy                    # when finished
+terraform init
+terraform plan -var="key_name=wq-key"
+terraform apply -var="key_name=wq-key"      # prints instance_public_ip, wait ~3 min
+ssh -i ~/.ssh/wq-key.pem ubuntu@<instance_public_ip>   # then: docker ps
+terraform destroy -var="key_name=wq-key"    # when finished
 ```
 
 ## Security results (Trivy)
