@@ -78,8 +78,8 @@ pipeline {
             AWS="docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$ECR_REGION amazon/aws-cli"
             # create the public repository on first run (ignored if it already exists)
             $AWS ecr-public create-repository --repository-name $IMAGE_NAME >/dev/null 2>&1 || true
-            ALIAS=$($AWS ecr-public describe-registries --query 'registries[0].registryAlias' --output text)
-            ECR=public.ecr.aws/$ALIAS/$IMAGE_NAME
+            ECR=$($AWS ecr-public describe-repositories --repository-names $IMAGE_NAME --query 'repositories[0].repositoryUri' --output text)
+            echo "ECR repository: $ECR"
             $AWS ecr-public get-login-password | docker login --username AWS --password-stdin public.ecr.aws
             docker tag $IMAGE_NAME:$IMAGE_TAG $ECR:$IMAGE_TAG
             docker tag $IMAGE_NAME:$IMAGE_TAG $ECR:latest
