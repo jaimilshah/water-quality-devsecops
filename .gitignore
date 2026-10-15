@@ -14,3 +14,6 @@ node_modules/
 
 # submission documents are kept local
 deliverables/
+
+# Terraform saved plans
+*tfplan*

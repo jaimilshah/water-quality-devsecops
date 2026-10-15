@@ -8,7 +8,7 @@ name: wq-ci
 
 services:
   sonarqube:
-    image: sonarqube:community
+    image: sonarqube:lts-community
     ports:
       - "127.0.0.1:9000:9000"
     environment:

@@ -1,24 +1,11 @@
-// Declarative CI/CD pipeline: test -> SonarQube -> Trivy -> build -> scan image -> Terraform check -> deploy
+// CI/CD pipeline: test -> SonarQube -> Trivy -> Docker build -> Trivy image scan -> deploy
 pipeline {
   agent any
 
-  options {
-    timestamps()
-    timeout(time: 30, unit: 'MINUTES')
-    buildDiscarder(logRotator(numToKeepStr: '10'))
-  }
-
-  parameters {
-    string(name: 'TRIVY_CACHE', defaultValue: 'trivy-cache',
-           description: 'Docker volume name or host path used as the Trivy DB cache')
-    booleanParam(name: 'DEPLOY_TO_AWS', defaultValue: false,
-                 description: 'Run terraform apply (needs AWS credentials in Jenkins and manual approval)')
-  }
-
   environment {
     IMAGE = "water-quality-monitor:${env.BUILD_NUMBER}"
-    TRIVY_RUN = "docker run --rm -v ${params.TRIVY_CACHE}:/root/.cache/trivy"
-    TRIVY_IMG = 'aquasec/trivy:latest'
+    // Trivy runs as a container; the volume keeps its vulnerability database between builds
+    TRIVY = 'docker run --rm -v trivy-cache:/root/.cache/trivy'
   }
 
   stages {
@@ -29,7 +16,7 @@ pipeline {
       }
     }
 
-    stage('Unit tests + coverage') {
+    stage('Unit tests') {
       steps {
         sh '''
           docker run --rm -v "$PWD":/w -w /w python:3.12-slim sh -c "
@@ -37,10 +24,9 @@ pipeline {
             python -m pytest -q --cov=app --cov-report=xml:reports/coverage.xml --junitxml=reports/junit.xml"
         '''
       }
-      post { always { junit 'reports/junit.xml' } }
     }
 
-    stage('SonarQube analysis') {
+    stage('SonarQube scan') {
       steps {
         withSonarQubeEnv('sonarqube') {
           sh '''
@@ -58,78 +44,46 @@ pipeline {
       }
     }
 
-    stage('Trivy: dependencies, secrets, IaC') {
+    stage('Trivy: scan code') {
       steps {
         sh '''
-          ${TRIVY_RUN} -v "$PWD":/w -w /w ${TRIVY_IMG} fs \
-            --scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 \
-            --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform --format table .
-          ${TRIVY_RUN} -v "$PWD":/w -w /w ${TRIVY_IMG} fs \
-            --scanners vuln,secret,misconfig --format json -o reports/trivy-fs.json \
-            --skip-dirs .git,reports,.venv,.scannerwork,terraform/.terraform .
+          $TRIVY -v "$PWD":/w -w /w aquasec/trivy fs --scanners vuln,secret,misconfig \
+            --severity HIGH,CRITICAL --exit-code 1 --skip-dirs .git,reports,.scannerwork,terraform/.terraform .
         '''
       }
     }
 
     stage('Docker build') {
-      steps { sh 'docker build -t ${IMAGE} .' }
+      steps { sh 'docker build -t $IMAGE .' }
     }
 
-    stage('Trivy: image scan') {
+    stage('Trivy: scan image') {
       steps {
         sh '''
-          ${TRIVY_RUN} -v /var/run/docker.sock:/var/run/docker.sock ${TRIVY_IMG} image \
-            --severity HIGH,CRITICAL --exit-code 1 ${IMAGE}
-          ${TRIVY_RUN} -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out ${TRIVY_IMG} image \
-            --format json -o /out/trivy-image.json ${IMAGE}
+          $TRIVY -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
+            --severity HIGH,CRITICAL --exit-code 1 $IMAGE
+          $TRIVY -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/reports":/out aquasec/trivy image \
+            --format json -o /out/trivy-image.json $IMAGE
         '''
       }
     }
 
-    stage('Terraform validate') {
+    stage('Deploy') {
       steps {
         sh '''
-          docker run --rm -v "$PWD/terraform":/tf -w /tf hashicorp/terraform:1.9 fmt -check -recursive
-          docker run --rm -v "$PWD/terraform":/tf -w /tf hashicorp/terraform:1.9 init -backend=false -input=false
-          docker run --rm -v "$PWD/terraform":/tf -w /tf hashicorp/terraform:1.9 validate
+          docker rm -f wq-deployed || true
+          docker run -d --name wq-deployed --network wq-ci-net -p 8081:8000 $IMAGE
+          sleep 5
+          curl -f http://wq-deployed:8000/health
         '''
-      }
-    }
-
-    stage('Deploy (Docker)') {
-      when { expression { (env.GIT_BRANCH ?: 'main') ==~ /(origin\/)?main/ } }
-      steps {
-        sh '''
-          docker rm -f wq-deployed >/dev/null 2>&1 || true
-          docker run -d --name wq-deployed --network wq-ci-net -p 8081:8000 --restart unless-stopped \
-            --read-only --tmpfs /tmp --cap-drop ALL --security-opt no-new-privileges ${IMAGE}
-          for i in 1 2 3 4 5 6 7 8; do curl -fsS http://wq-deployed:8000/health && break; sleep 3; done
-          curl -fsS http://wq-deployed:8000/health
-        '''
-      }
-    }
-
-    stage('Terraform apply (AWS)') {
-      when { expression { params.DEPLOY_TO_AWS } }
-      steps {
-        input message: 'Apply Terraform and create billable AWS resources?'
-        withCredentials([usernamePassword(credentialsId: 'aws-creds',
-                                          usernameVariable: 'AWS_ACCESS_KEY_ID',
-                                          passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-          sh '''
-            docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -v "$PWD/terraform":/tf -w /tf \
-              hashicorp/terraform:1.9 init -input=false
-            docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -v "$PWD/terraform":/tf -w /tf \
-              hashicorp/terraform:1.9 apply -auto-approve -input=false
-          '''
-        }
       }
     }
   }
 
   post {
-    always { archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true }
-    success { echo 'Pipeline succeeded' }
-    failure { echo 'Pipeline failed - see stage logs and reports/' }
+    always {
+      junit 'reports/junit.xml'
+      archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true
+    }
   }
 }

@@ -1,29 +1,27 @@
-# Hardened image: minimal Alpine base, patched OS packages, no package manager
-# in the runtime layer, non-root runtime user.
+# Small Alpine base image with Python
 FROM python:3.12-alpine
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8000
+# Install OS security patches
+RUN apk upgrade --no-cache
 
 WORKDIR /srv
 
-RUN apk upgrade --no-cache
-
+# Install the libraries first (this layer is cached when only code changes)
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
- && pip install --no-cache-dir -r requirements.txt \
- && pip uninstall -y pip
+RUN pip install --no-cache-dir -r requirements.txt \
+ && pip uninstall -y pip setuptools
+# (pip is removed after installing: it is not needed at runtime and Trivy flags its bundled libraries)
 
+# Copy the application code
 COPY app/ ./app/
 
-RUN adduser -S -D -H -s /sbin/nologin appuser
+# Run as a normal user instead of root
+RUN adduser -S -D -H appuser
 USER appuser
 
 WORKDIR /srv/app
+ENV PORT=8000
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD python -c "import urllib.request,os;urllib.request.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT','8000'))"
-
-CMD ["sh", "-c", "exec gunicorn --preload --bind 0.0.0.0:${PORT} --workers 2 --access-logfile - app:app"]
+# Start the web server
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "app:app"]
