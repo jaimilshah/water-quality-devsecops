@@ -1,3 +1,4 @@
+# names[1] = ap-south-1b (t4g.micro had no capacity in ap-south-1a)
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -12,7 +13,7 @@ resource "aws_vpc" "lab_vpc" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.lab_vpc.id
   cidr_block              = var.public_subnet_cidr
-  availability_zone       = data.aws_availability_zones.available.names[0]
+  availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = true #trivy:ignore:AVD-AWS-0164 public subnet: the web server needs a public IP
   tags                    = { Name = "wq-devsecops-public-subnet" }
 }
