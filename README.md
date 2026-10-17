@@ -12,7 +12,7 @@ A Flask web application that validates, classifies and raises alerts on water-qu
 | Version control | Git + GitHub | this repo |
 | Containerisation | Docker (Alpine, non-root, no pip in runtime) | `Dockerfile` |
 | CI/CD | Jenkins declarative pipeline, image pushed to AWS ECR | `Jenkinsfile`, `ci/` |
-| Infrastructure | Terraform on AWS (VPC, subnet, security group, Ubuntu EC2 that pulls the image from ECR) | `terraform/` |
+| Infrastructure | Terraform on AWS (VPC, subnet, security group, Ubuntu 22.04 EC2 that pulls the image from ECR) | `terraform/` |
 | Code quality / SAST | SonarQube | `sonar-project.properties` |
 | Dependency, image, IaC scanning | Trivy | `reports/` |
 | Diagrams | architecture + CI/CD workflow | `diagrams/` |
