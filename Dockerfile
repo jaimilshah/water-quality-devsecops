@@ -1,5 +1,5 @@
 # Small Alpine base image with Python
-FROM python:3.12-alpine
+FROM python:3.9-alpine3.16
 
 # Install OS security patches
 RUN apk upgrade --no-cache
